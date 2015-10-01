@@ -1,0 +1,290 @@
+
+#include "stdafx.h"
+#include <iostream>
+#include <ctime>
+using namespace std;
+
+
+class LLNode            //Class LLNode represents a single node
+{
+private:
+	int data;      //data is the value of the element which is to be stored in each node of the linked list
+public:
+	int getData()   //As data is private, for using it in another class or main defining functions to get and set value
+	{
+		return data;
+	}
+
+	void setData(int new_data)
+	{
+		data = new_data;
+	}
+};
+
+class Linkedlist :LLNode     //Class Linkedlist represents the collection of nodes and
+	//includes all the behavior which can be carried over nodes and linked-list
+{
+private:
+	int size;         //This is the maximum size of the linked-list
+	int cur_size;     //this is the current size of the linked list based on number of nodes inserted
+	int cur;          //current value of the last node index
+
+public:
+	LLNode Llist[100000];        //created an array of objects of nodes
+
+	Linkedlist(int new_size)     //constructor which initializes value of size variable and allocated memory
+	{
+		size = new_size;
+		cur_size = 0;
+		cur = -1;
+		cout << "Memory allocated, Constructor called!!" << endl;
+	}
+
+	~Linkedlist()     //destructor which deallocates memory
+	{
+		cout << "Memory is free, destructor called!!" << endl;
+	};
+
+	int getCurrent()   //to get and set value of the current size of the linked-list as it is a private variable
+	{
+		return cur_size;
+	}
+
+	void setCurrent(int new_current)
+	{
+		cur_size = new_current;
+	}
+
+
+	void insertNode(LLNode newnode)   //adding or inserting a node to the existing linked-list at the end
+	{
+
+		if (cur_size < size)
+		{
+			Llist[cur + 1] = newnode;
+			cur_size += 1;
+			cur += 1;
+			cout << "Note: Element added at " << cur << endl;
+		}
+		else                          //if the current size reaches its maximum value i.e size then we should not allow to insert
+			//an element further
+		{
+			cout << "Error: Out of bound!!" << endl;
+		}
+	}
+
+	void shiftRight(int position)   //this function handles shifting nodes to right by one
+
+	{
+		for (int i = cur_size; i >= position; i--)
+		{
+			Llist[i + 1] = Llist[i];
+		}
+	}
+
+	void insertNode(LLNode newnode, int position)  //this function inserts node at a desired position
+		//but only within the current size
+
+	{
+		if (cur_size < size && position < cur_size && position >= 0)   //insert is successful only if current size is less than
+			//maximum size and the position where it has to be inserted
+		{                                                              //has to be less than current size
+			shiftRight(position);      //calling the right shift function
+			Llist[position] = newnode;
+			cur_size += 1;
+			cur += 1;
+			cout << "Note: Element added at" + position << endl;
+		}
+
+		else {
+			cout << "ERror: Please provide valid index, "
+				"non-negative and less than the current linked-list size of " << cur_size << endl;
+		}
+	}
+
+	void printArray()    //this will print the current size of the linked list and all the nodes with element
+	{
+		cout << "Current size of the linked-list is: " << cur_size << endl;
+		for (int j = 0; j<cur_size; j++)
+		{
+			cout << "Node " << (j) << ": " << Llist[j].getData() << endl;
+		}
+	}
+
+	Linkedlist& operator = (const Linkedlist &a)      //this is operator overloading, which assigns one linked list to another, thus
+	{                                     //copying all the nodes of source linked list to destination one
+
+		for (int i = 0; i < a.cur_size; i++)
+		{
+			this->insertNode(a.Llist[i]);
+		}
+		cout << "New linked list created successfully" << endl;
+		return *this;
+	}
+
+	void nextNode(LLNode newnode)   //this provides the element next to the desired element
+	{
+		int position = nodeSearch(newnode.getData());
+		if (position == -1) { cout << "No such element" << endl; }
+		else if (position == cur_size - 1){ cout << "No next element to display" << endl; }
+		else { cout << "The next element is " << Llist[position + 1].getData() << endl; }
+
+	}
+
+
+	void shiftLeft(int position)   //this function shifts the nodes to left by one
+
+	{
+		for (int i = position; i <= cur_size; i++)
+		{
+			Llist[i] = Llist[i + 1];
+		}
+	}
+
+	void deleteNode(LLNode newnode)     //this will delete the element and hence node, updates current size of the linked-size
+	{
+		int position = nodeSearch(newnode.getData());
+		if (position == -1) { cout << "No such element" << endl; }
+		else
+		{
+			shiftLeft(position);
+			cur_size -= 1;
+			cur -= 1;
+			cout << "Note: Deleted node " << position << " successfully" << endl;
+		}
+	}
+
+	int nodeSearch(int data)  //this will search the node where the desired element is present and returns the index or -1 if not foud
+	{                      //also it give the time consumed to search the element
+		if (cur_size == 0)
+		{
+			return -1;
+		}
+		else
+		{
+			float start = clock();
+			for (int j = 0; j < size; j++)
+			{
+				if (Llist[j].getData() == data)
+				{
+					cout << endl << "Node number of the Element is:  " << j << endl;
+					start = (clock() - start) / CLOCKS_PER_SEC;
+					cout << "Time taken to search the element: " << start << " secs" << endl;
+					return j;
+				}
+				//else if (j >= size)	{ cout << "Element Not Found" << endl; return -1; }
+			}
+		
+					cout << "Element Not Found" << endl; 
+					start = (clock() - start) / CLOCKS_PER_SEC;
+					cout << "Time taken to search the element: " << start << " secs" << endl;
+					return -1;
+			
+			}
+			
+		}
+};
+
+int main()
+{
+	cout << "Hello, Welcome to the Linked-list program!" << endl <<
+		"Please Provide the maximum size of the linked-list: ";
+	int size;
+	cin >> size;            //maximum size of linked list taken as input from user
+
+check:	if (size <= 0 || size>100000)    //max size check that it should be valid
+{
+	cout << "Please specify valid size limit here: ";
+	cin >> size;
+	goto check;
+}
+
+		Linkedlist list1(size);    //declared object of linkedlist class
+		int user_element;
+		int index;
+		LLNode a1;                //object of type LLNode is declared
+
+
+		for (int kk = 0; kk<size; kk++)
+		{
+			a1.setData(1000 + kk);
+			list1.insertNode(a1);
+		}
+
+ask:    cout <<endl<<endl<< "Please select one of the options to continue" << endl <<
+		"1: Add a node" << endl <<
+		"2: Add a node at a particular index" << endl <<
+		"3: Delete a node" << endl <<
+		"4: Print nodes" << endl <<
+		"5: Next node" << endl <<
+		"6: Copy the linked list into another" << endl <<
+		"7: Search value" << endl <<
+		"8: Exit program" << endl;
+				int answer;
+				cin >> answer;           //this will allow user to select the next operation to be performed
+
+				switch (answer)        //based on the option selected, we call corresponding function
+				{
+				case 1: cout << "Please provide the element to insert: ";    //asking user to insert element in the first node
+					cin >> user_element;
+					a1.setData(user_element);
+					list1.insertNode(a1);
+					goto ask;
+
+				case 2:
+				{
+					cout << "Please provide the element to insert and the index number respectively: " << endl;
+
+					cin >> user_element;
+					cin >> index;
+					LLNode a2;
+					a2.setData(user_element);
+					list1.insertNode(a2, index);
+					goto ask;
+				}
+				break;
+				case 3:
+				{
+					cout << "Please provide the element to be deleted: ";
+					cin >> user_element;
+					a1.setData(user_element);
+					list1.deleteNode(a1);
+					goto ask;
+				}
+				break;
+				case 4: {list1.printArray(); goto ask; }
+						break;
+				case 5:
+				{
+					cout << "Enter the element of whose next node is desired: ";
+					cin >> user_element;
+					a1.setData(user_element);
+					list1.nextNode(a1);
+					goto ask;
+				}
+				break;
+				case 6:
+				{
+					Linkedlist list2(list1.getCurrent());
+					list2 = list1;
+					list2.printArray();
+					goto ask;
+				}
+				break;
+				case 7:
+				{
+					int input;
+					cout << "Enter the value to search in the linked-list: ";
+					cin >> input;
+					list1.nodeSearch(input);
+					goto ask;
+				}
+				break;
+				case 8: cout << "Good Bye!" << endl;
+					break;
+				default: {cout << "Please provide a valid option" << endl; goto ask; }
+						 break;
+				}
+
+				return 0;
+}
